@@ -1,0 +1,56 @@
+# Stage 1: projector-only alignment on COCO captions.
+stage: alignment
+seed: 20261119
+
+model:
+  vision_model: google/siglip-so400m-patch14-384
+  language_model: Qwen/Qwen3-0.6B-Base
+  image_size: 384
+  projector_hidden: 1024
+  attn_implementation: sdpa
+  gradient_checkpointing: true
+
+lora:
+  enabled: false
+
+data:
+  raw_dir: /workspace/data/raw
+  cache_dir: /workspace/data/cache
+  image_size: 384
+  max_seq_len: 1024
+  max_captions_per_image: 3
+  num_workers: 4
+  datasets:
+    train:
+      - name: astro21/coco-caption-train-split-10k
+        split: train
+        limit: 10000
+    val:
+      - name: Multimodal-Fatima/COCO_captions_validation
+        split: validation
+        limit: 500
+    test:
+      - name: Multimodal-Fatima/COCO_captions_validation
+        split: validation
+        offset: 500
+        limit: 200
+
+optim:
+  batch_size: 8
+  grad_accum: 2
+  lr: 1.0e-3
+  weight_decay: 0.01
+  warmup_ratio: 0.03
+  clip_grad: 1.0
+  schedule: cosine
+  dtype: bf16
+  vision_lr: 0.0
+
+train:
+  max_steps: -1
+  max_train_seconds: 2400
+  log_every: 10
+  eval_every: 250
+  eval_samples: 100
+  keep_last_n: 3
+  checkpoint_dir: /workspace/checkpoints/stage1

@@ -1,0 +1,63 @@
+# Stage 2: instruction tuning with LoRA on LLM and frozen projector.
+stage: instruct
+seed: 20261119
+
+model:
+  vision_model: google/siglip-so400m-patch14-384
+  language_model: Qwen/Qwen3-0.6B-Base
+  image_size: 384
+  projector_hidden: 1024
+  attn_implementation: sdpa
+  gradient_checkpointing: true
+
+lora:
+  enabled: true
+  r: 32
+  alpha: 64
+  dropout: 0.05
+
+data:
+  raw_dir: /workspace/data/raw
+  cache_dir: /workspace/data/cache
+  image_size: 384
+  max_seq_len: 1024
+  max_captions_per_image: 2
+  num_workers: 4
+  datasets:
+    train:
+      - name: HuggingFaceH4/llava-instruct-mix-vsft
+        split: train
+        limit: 12000
+        image_key: images
+        conversation_key: conversations
+    val:
+      - name: HuggingFaceH4/llava-instruct-mix-vsft
+        split: test
+        offset: 12000
+        limit: 300
+    test:
+      - name: HuggingFaceH4/llava-instruct-mix-vsft
+        split: test
+        limit: 200
+        offset: 12200
+
+optim:
+  batch_size: 2
+  grad_accum: 8
+  lr: 1.0e-4
+  projector_lr: 5.0e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.03
+  clip_grad: 1.0
+  schedule: cosine
+  dtype: bf16
+  vision_lr: 0.0
+
+train:
+  max_steps: -1
+  max_train_seconds: 9000
+  log_every: 10
+  eval_every: 250
+  eval_samples: 100
+  keep_last_n: 3
+  checkpoint_dir: /workspace/checkpoints/stage2

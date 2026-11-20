@@ -1,0 +1,36 @@
+{
+  "displayName": "thomasvlm-1b-training",
+  "jobSpec": {
+    "workerPoolSpecs": [
+      {
+        "machineSpec": {
+          "machineType": "a2-highgpu-1g",
+          "acceleratorType": "NVIDIA_A100",
+          "acceleratorCount": 1
+        },
+        "replicaCount": 1,
+        "containerSpec": {
+          "imageUri": "gcr.io/PROJECT_ID/thomasvlm:latest",
+          "command": ["python", "-m", "thomasllm.run.vertex_entry"],
+          "env": [
+            {
+              "name": "HF_TOKEN",
+              "value": "YOUR_HF_TOKEN_HERE"
+            },
+            {
+              "name": "WANDB_API_KEY",
+              "value": "YOUR_WANDB_KEY_HERE"
+            }
+          ]
+        }
+      }
+    ],
+    "baseOutputDirectory": {
+      "outputUriPrefix": "gs://YOUR_BUCKET/thomasvlm"
+    },
+    "scheduling": {
+      "maxRunningTime": "10800s",
+      "restartJobOnWorkerRestart": true
+    }
+  }
+}

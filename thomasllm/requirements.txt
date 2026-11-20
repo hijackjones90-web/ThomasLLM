@@ -1,0 +1,19 @@
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
+transformers==4.51.3
+datasets==3.2.0
+peft==0.14.0
+safetensors==2.20.0
+Pillow==10.3.0
+numpy==1.26.4
+matplotlib==3.8.0
+huggingface_hub==1.3.3
+sentencepiece==0.1.8
+accelerate==0.30.0
+bitsandbytes==1.20.0  # requires --no-use-peft flag
+
+# dev/test
+sacrebleu==2.30.0
+opencv-python==0.0.0  # optional camera fallback
+# i.e., opencv-python and numpy for --camera (may not be available)
+# huggingface_hub[cli] is included in huggingface_hub==1.3.3
