@@ -1,0 +1,42 @@
+# Default configuration for npu_screen daemon (Windows 11)
+# Sections match thomasllm/npu_screen/config.py dataclasses.
+
+model:
+  repo_id: Qwen/Qwen3.5-4B
+  ov_model_dir: null          # path to local OpenVINO IR (built by install script)
+  quantization: int4          # int4 (default) or int8 fallback
+  context_length: 4096        # keep KV cache small for NPU memory
+  image_size: 384             # vision input size (longest edge)
+  device: NPU                 # force NPU only; do not change to CPU/GPU
+  enable_thinking: false      # disable thinking for short screen descriptions
+
+capture:
+  fps: 10.0                   # dxcam capture FPS
+  region: null                # null = full screen; [left, top, right, bottom] for region
+  window: null                # window title substring (alternative to region)
+  max_queue_size: 4           # drop-oldest when queue full
+
+preprocess:
+  image_size: 384
+  resample: bilinear          # bilinear | bicubic | lanczos
+  mean: [0.485, 0.456, 0.406]
+  std:  [0.229, 0.224, 0.225]
+
+infer:
+  max_new_tokens: 64          # short responses keep latency low
+  use_mtp: true               # MTP speculative decoding (Qwen3.5 supported)
+  do_sample: false            # deterministic output
+  skip_if_unchanged: true     # skip redundant inference on identical frames
+  prompt: >
+    Describe what is currently visible on the user's screen. Be concise and
+    answer in one or two sentences.
+
+outputs:
+  overlay: true               # show OSD overlay with latest response
+  pipe_path: "\\\\.\\pipe\\qwen35"
+  socket_port: 8765
+  emit_responses: true        # emit JSON Lines to pipe and/or socket
+
+hotkey:
+  hotkey: "<ctrl>+<alt>+q"    # pynput GlobalHotKeys format
+  enabled: true

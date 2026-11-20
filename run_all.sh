@@ -30,4 +30,7 @@ python -m thomasllm.eval.generate --config thomasllm/configs/stage1_alignment.ya
 echo "=== 8. Inference (single image) ==="
 python -m thomasllm.infer --image <IMAGE> --prompt "Describe this image." --config thomasllm/configs/stage1_alignment.yaml
 
+# Optional: npu_screen smoke test / daemon launch (requires Windows + Intel NPU)
+# python -m thomasllm.npu_screen.cli --config thomasllm/npu_screen/configs/default.yaml
+
 echo "ALL STEPS DONE"
